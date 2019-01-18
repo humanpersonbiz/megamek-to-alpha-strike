@@ -45,8 +45,12 @@ const addChassis = (lines: string[], mech: IMech) => {
     const camelized = camelCase(key);
     const num = convertToNumber(value);
 
-    if (isChassisAttribute(camelized) && num) {
-      mech.chassis[camelized] = num;
+    if (isChassisAttribute(camelized)) {
+      if (camelized === 'mass' && num) {
+        mech.chassis[camelized] = num;
+      } else {
+        mech.chassis[camelized] = value;
+      }
     }
   });
 };
