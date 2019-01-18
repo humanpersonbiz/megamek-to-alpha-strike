@@ -1,41 +1,51 @@
-import * as fs from 'fs';
-import buildMechJson from './buildMechJson';
-import { IMech } from './types';
-import { makeJsonFilename } from './util';
+import chalk from 'chalk';
+import express from 'express';
+import readMtsFile from './readMtsFile';
 
-const inDirectory = 'inFiles';
-const outDirectory = 'outFiles';
+const { blue, gray, white } = chalk;
 
-const getData = (filename: string): Promise<string> =>
-  new Promise((resolve, reject) =>
-    fs.readFile(`./${inDirectory}/${filename}`, 'utf-8', (err, data) =>
-      err ? reject(err) : resolve(data),
+(() => {
+  const app = express();
+  const port = process.env.PORT || 3000;
+
+  app.get('/', async (req, res) => {
+    const mechs = await readMtsFile();
+
+    const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>megamek-to-alpha-strike</title>
+  <link rel="stylesheet"
+        href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/default.min.css">
+</head>
+<body>
+  <pre>
+    <code class="JSON">
+${JSON.stringify(mechs, null, 2)}
+    </code>
+  </pre>
+  
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+</body>
+</html>
+`;
+
+    res.status(200).send(html);
+  });
+
+  app.listen(port, () =>
+    console.log(
+      `
+${blue(`Now listening at...`)}
+${white(`http://localhost:${port}`)}   ${blue(`<--Open in your browser`)}
+`,
     ),
   );
-
-const writeMechFile = (mech: IMech, filename: string) =>
-  new Promise((resolve, reject) =>
-    fs.writeFile(
-      `./${outDirectory}/${filename}`,
-      JSON.stringify(mech, null, 2),
-      err => (err ? reject(err) : resolve()),
-    ),
-  );
-
-const getDataAndBuildMech = async (filename: string) => {
-  try {
-    const [data, jsonFilename] = await Promise.all([
-      getData(filename),
-      makeJsonFilename(filename),
-    ]);
-    const mech = buildMechJson(data);
-
-    return writeMechFile(mech, jsonFilename);
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-const filenames = fs.readdirSync(inDirectory);
-
-export default () => Promise.all(filenames.map(getDataAndBuildMech));
+})();
