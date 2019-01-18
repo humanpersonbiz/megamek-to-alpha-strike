@@ -38,4 +38,4 @@ const getDataAndBuildMech = async (filename: string) => {
 
 const filenames = fs.readdirSync(inDirectory);
 
-export default Promise.all(filenames.map(getDataAndBuildMech));
+export default () => Promise.all(filenames.map(getDataAndBuildMech));

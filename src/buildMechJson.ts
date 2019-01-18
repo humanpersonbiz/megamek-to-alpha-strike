@@ -1,37 +1,16 @@
 import { camelCase } from 'lodash';
-import {
-  AttributeFunction,
-  AttributeKeys,
-  Constants,
-  IArmorAttributes,
-  IChassisAttributes,
-  IConfigAttributes,
-  IInfoAttributes,
-  IMech,
-  ISlotsAttributes,
-  ITemperatureAttributes,
-  IWeapon,
-  SlotKey,
-  WeaponsAttribute,
-} from './types';
+import { Constants, IArmorAttributes, IMech, IWeapon, SlotKey } from './types';
 import {
   convertToNumber,
   getKeyValue,
+  isArmorAttribute,
   isAttributeKey,
+  isChassisAttribute,
+  isConfigAttribute,
+  isSlotsAttribute,
+  isTemperatureAttribute,
   lineContains,
 } from './util';
-
-const isConfigAttribute = (value: string): value is keyof IConfigAttributes =>
-  value === 'configuration' ||
-  value === 'era' ||
-  value === 'rulesLevel' ||
-  value === 'techBase';
-
-const isChassisAttribute = (value: string): value is keyof IChassisAttributes =>
-  value === 'engine' ||
-  value === 'mass' ||
-  value === 'myomer' ||
-  value === 'structure';
 
 const addInfo = (lines: string[], mech: IMech) => {
   const [_, version] = getKeyValue(lines[0]);
@@ -72,14 +51,6 @@ const addChassis = (lines: string[], mech: IMech) => {
   });
 };
 
-const isTemperatureAttribute = (
-  value: string,
-): value is keyof ITemperatureAttributes =>
-  value === 'heatSinksCount' ||
-  value === 'heatSinksType' ||
-  value === 'jumpMp' ||
-  value === 'walkMp';
-
 const addTemperature = (lines: string[], mech: IMech) => {
   lines.forEach((line, index) => {
     const [key, value] = getKeyValue(line);
@@ -102,20 +73,6 @@ const addTemperature = (lines: string[], mech: IMech) => {
     }
   });
 };
-
-const isArmorAttribute = (value: string): value is keyof IArmorAttributes =>
-  value === 'ctArmor' ||
-  value === 'hdArmor' ||
-  value === 'laArmor' ||
-  value === 'llArmor' ||
-  value === 'ltArmor' ||
-  value === 'raArmor' ||
-  value === 'rlArmor' ||
-  value === 'rtArmor' ||
-  value === 'rtcArmor' ||
-  value === 'rtlArmor' ||
-  value === 'rtrArmor' ||
-  value === 'type';
 
 const addArmor = (lines: string[], mech: IMech) => {
   lines.forEach((line, index) => {
@@ -160,16 +117,6 @@ const addWeapons = (lines: string[], mech: IMech) => {
     }
   });
 };
-
-const isSlotsAttribute = (value: string): value is keyof ISlotsAttributes =>
-  value === 'centerTorso' ||
-  value === 'head' ||
-  value === 'leftArm' ||
-  value === 'leftLeg' ||
-  value === 'leftTorso' ||
-  value === 'rightArm' ||
-  value === 'rightLeg' ||
-  value === 'rightTorso';
 
 const addSlots = (lines: string[], mech: IMech) => {
   const slots: string[] = [];
