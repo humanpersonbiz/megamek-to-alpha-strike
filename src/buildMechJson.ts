@@ -1,110 +1,94 @@
 import { camelCase } from 'lodash';
-import {
-  AttributeFunction,
-  AttributeKeys,
-  IAttributeObject,
-  IMech,
-  IWeapon,
-  SlotKey,
-  WeaponsAttribute,
-} from './types';
+import { Constants, IArmorAttributes, IMech, IWeapon, SlotKey } from './types';
 import {
   convertToNumber,
   getKeyValue,
+  isArmorAttribute,
   isAttributeKey,
+  isChassisAttribute,
+  isConfigAttribute,
+  isSlotsAttribute,
+  isTemperatureAttribute,
   lineContains,
 } from './util';
 
-const buildInfoAttribute: AttributeFunction<AttributeKeys.INFO> = (
-  lines: string[],
-) => {
+const addInfo = (lines: string[], mech: IMech) => {
   const [_, version] = getKeyValue(lines[0]);
-  const info: IAttributeObject = {
+
+  mech.info = {
     model: lines[2],
     name: lines[1],
     version,
   };
-
-  return { key: AttributeKeys.INFO, obj: info };
 };
 
-const buildConfigAttribute: AttributeFunction<AttributeKeys.CONFIG> = (
-  lines: string[],
-) => {
-  const config: IAttributeObject = {};
-
+const addConfig = (lines: string[], mech: IMech) => {
   lines.forEach((line, index) => {
     const [key, value] = getKeyValue(line);
+
     if (index === 0) {
-      config.configuration = value;
+      mech.config.configuration = value;
     } else {
       const camelized = camelCase(key);
 
-      config[camelized] =
-        key === 'Rules Level' ? convertToNumber(value) : value;
+      if (isConfigAttribute(camelized)) {
+        mech.config[camelized] =
+          key === 'Rules Level' ? convertToNumber(value) || 0 : value;
+      }
     }
   });
-
-  return { key: AttributeKeys.CONFIG, obj: config };
 };
 
-const buildChassisAttribute: AttributeFunction<AttributeKeys.CHASSIS> = (
-  lines: string[],
-) => {
-  const chassis: IAttributeObject = {};
-
+const addChassis = (lines: string[], mech: IMech) => {
   lines.forEach(line => {
     const [key, value] = getKeyValue(line);
     const camelized = camelCase(key);
+    const num = convertToNumber(value);
 
-    chassis[camelized] = convertToNumber(value);
+    if (isChassisAttribute(camelized) && num) {
+      mech.chassis[camelized] = num;
+    }
   });
-
-  return { key: AttributeKeys.CHASSIS, obj: chassis };
 };
 
-const buildTemperatureAttribute: AttributeFunction<
-  AttributeKeys.TEMPERATURE
-> = (lines: string[]) => {
-  const temperature: IAttributeObject = {};
-
+const addTemperature = (lines: string[], mech: IMech) => {
   lines.forEach((line, index) => {
     const [key, value] = getKeyValue(line);
     const camelized = camelCase(key);
 
     if (index === 0) {
-      const [count, type] = value.split(' ');
+      const [countRaw, type] = value.split(' ');
+      const count = convertToNumber(countRaw);
 
-      temperature.heatSinksCount = convertToNumber(count);
-      temperature.heatSinksType = type;
-    } else {
-      temperature[camelized] = convertToNumber(value);
+      if (count) {
+        mech.temperature.heatSinksCount = count;
+      }
+      mech.temperature.heatSinksType = type;
+    } else if (isTemperatureAttribute(camelized)) {
+      const num = convertToNumber(value);
+
+      if (num) {
+        mech.temperature[camelized] = num;
+      }
     }
   });
-
-  return { key: AttributeKeys.TEMPERATURE, obj: temperature };
 };
 
-const buildArmorAttribute: AttributeFunction<AttributeKeys.ARMOR> = (
-  lines: string[],
-) => {
-  const armor: IAttributeObject = {};
-
+const addArmor = (lines: string[], mech: IMech) => {
   lines.forEach((line, index) => {
     const [key, value] = getKeyValue(line);
-    const camelized = camelCase(key);
+    const camelized = camelCase(key) as keyof IArmorAttributes;
+    const num = convertToNumber(value);
 
     if (index === 0) {
-      armor.type = value;
-    } else {
-      armor[camelized] = convertToNumber(value);
+      mech.armor.type = value;
+    } else if (isArmorAttribute(camelized) && num) {
+      mech.armor[camelized] = num;
     }
   });
-
-  return { key: AttributeKeys.ARMOR, obj: armor };
 };
 
-const buildWeaponObject = (line: string): IWeapon => {
+const addWeapon = (line: string): IWeapon => {
   const [weapon, slot, possibleAmmo] = line.split(/,\s/g);
   const weaponObject: IWeapon = { slot: camelCase(slot) as SlotKey, weapon };
 
@@ -124,26 +108,17 @@ const buildWeaponObject = (line: string): IWeapon => {
   return weaponObject;
 };
 
-const buildWeaponsAttribute: AttributeFunction<AttributeKeys.WEAPONS> = (
-  lines: string[],
-) => {
-  const weapons: WeaponsAttribute = [];
-
+const addWeapons = (lines: string[], mech: IMech) => {
   lines.forEach((line, index) => {
     if (index > 0) {
-      const weaponObject = buildWeaponObject(line);
+      const weaponObject = addWeapon(line);
 
-      weapons.push(weaponObject);
+      mech.weapons.push(weaponObject);
     }
   });
-
-  return { key: AttributeKeys.WEAPONS, obj: weapons };
 };
 
-const addSlotToSlotsObject = (
-  lines: string[],
-  slotsObject: IAttributeObject,
-) => {
+const addSlots = (lines: string[], mech: IMech) => {
   const slots: string[] = [];
 
   lines.forEach((line, index) => {
@@ -151,46 +126,45 @@ const addSlotToSlotsObject = (
       const [key] = getKeyValue(line);
       const camelized = camelCase(key);
 
-      slotsObject[camelized] = slots;
+      if (isSlotsAttribute(camelized)) {
+        mech.slots[camelized] = slots;
+      }
     } else if (line !== '-Empty-') {
       slots.push(line);
     }
   });
 };
 
-const buildIAttributeObject = (
-  lines: string[],
-  slotsObject: IAttributeObject,
-) => {
+const addAttributesToMech = (lines: string[], mech: IMech) => {
   const firstLine = lines[0];
 
   if (lineContains(firstLine, 'Version')) {
-    return buildInfoAttribute(lines);
+    return addInfo(lines, mech);
   }
 
   if (lineContains(firstLine, 'Config')) {
-    return buildConfigAttribute(lines);
+    return addConfig(lines, mech);
   }
 
   if (lineContains(firstLine, 'Mass')) {
-    return buildChassisAttribute(lines);
+    return addChassis(lines, mech);
   }
 
   if (lineContains(firstLine, 'Heat Sinks')) {
-    return buildTemperatureAttribute(lines);
+    return addTemperature(lines, mech);
   }
 
   if (lineContains(firstLine, 'Armor')) {
-    return buildArmorAttribute(lines);
+    return addArmor(lines, mech);
   }
 
   if (lineContains(firstLine, 'Weapons')) {
-    return buildWeaponsAttribute(lines);
+    return addWeapons(lines, mech);
   }
 
-  addSlotToSlotsObject(lines, slotsObject);
+  addSlots(lines, mech);
 
-  return null;
+  return mech;
 };
 
 const groupLinesByAttribute = (lines: string[]) => {
@@ -216,23 +190,60 @@ const groupLinesByAttribute = (lines: string[]) => {
 
 export default (data: string) => {
   const lines = data.split(`\r\n`);
-  const attributeArrays = groupLinesByAttribute(lines);
+  const groups = groupLinesByAttribute(lines);
 
-  const slots: IAttributeObject = {};
-  const attributes = attributeArrays.map(attributeArray =>
-    buildIAttributeObject(attributeArray, slots),
-  );
-
-  return attributes.reduce(
-    (accumulator, current) => {
-      if (accumulator && current) {
-        const { key, obj } = current;
-
-        accumulator[key] = obj;
-      }
-
-      return accumulator;
+  const mech: IMech = {
+    armor: {
+      ctArmor: 0,
+      hdArmor: 0,
+      laArmor: 0,
+      llArmor: 0,
+      ltArmor: 0,
+      raArmor: 0,
+      rlArmor: 0,
+      rtArmor: 0,
+      rtcArmor: 0,
+      rtlArmor: 0,
+      rtrArmor: 0,
+      type: Constants.NOT_AVAILABLE,
     },
-    { slots } as IMech,
-  );
+    chassis: {
+      engine: Constants.NOT_AVAILABLE,
+      mass: 0,
+      myomer: Constants.NOT_AVAILABLE,
+      structure: Constants.NOT_AVAILABLE,
+    },
+    config: {
+      configuration: Constants.NOT_AVAILABLE,
+      era: Constants.NOT_AVAILABLE,
+      rulesLevel: 0,
+      techBase: Constants.NOT_AVAILABLE,
+    },
+    info: {
+      model: Constants.NOT_AVAILABLE,
+      name: Constants.NOT_AVAILABLE,
+      version: Constants.NOT_AVAILABLE,
+    },
+    slots: {
+      centerTorso: [],
+      head: [],
+      leftArm: [],
+      leftLeg: [],
+      leftTorso: [],
+      rightArm: [],
+      rightLeg: [],
+      rightTorso: [],
+    },
+    temperature: {
+      heatSinksCount: 0,
+      heatSinksType: Constants.NOT_AVAILABLE,
+      jumpMp: 0,
+      walkMp: 0,
+    },
+    weapons: [],
+  };
+
+  groups.forEach(group => addAttributesToMech(group, mech));
+
+  return mech;
 };
