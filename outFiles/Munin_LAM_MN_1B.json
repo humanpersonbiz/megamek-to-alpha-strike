@@ -1,30 +1,36 @@
 {
+  "armor": {
+    "ctArmor": 20,
+    "hdArmor": 9,
+    "laArmor": 12,
+    "llArmor": 17,
+    "ltArmor": 14,
+    "raArmor": 12,
+    "rlArmor": 17,
+    "rtArmor": 14,
+    "rtcArmor": 5,
+    "rtlArmor": 4,
+    "rtrArmor": 4,
+    "type": "Standard Armor"
+  },
+  "chassis": {
+    "engine": "not-available",
+    "mass": 45,
+    "myomer": "not-available",
+    "structure": "not-available"
+  },
+  "config": {
+    "configuration": "LAM",
+    "era": "3025",
+    "rulesLevel": 5,
+    "techBase": "Inner Sphere"
+  },
+  "info": {
+    "model": "MN-1B",
+    "name": "Munin LAM",
+    "version": "1.0"
+  },
   "slots": {
-    "leftArm": [
-      "Shoulder",
-      "Upper Arm Actuator",
-      "Lower Arm Actuator",
-      "Hand Actuator",
-      "ISMediumLaser",
-      "ISSmallLaser"
-    ],
-    "rightArm": [
-      "Shoulder",
-      "Upper Arm Actuator",
-      "Lower Arm Actuator",
-      "Hand Actuator",
-      "ISLargeLaser",
-      "ISLargeLaser",
-      "ISMediumLaser"
-    ],
-    "leftTorso": [
-      "Jump Jet",
-      "Jump Jet"
-    ],
-    "rightTorso": [
-      "Jump Jet",
-      "Jump Jet"
-    ],
     "centerTorso": [
       "Fusion Engine",
       "Fusion Engine",
@@ -46,6 +52,14 @@
       "Sensors",
       "Life Support"
     ],
+    "leftArm": [
+      "Shoulder",
+      "Upper Arm Actuator",
+      "Lower Arm Actuator",
+      "Hand Actuator",
+      "ISMediumLaser",
+      "ISSmallLaser"
+    ],
     "leftLeg": [
       "Hip",
       "Upper Leg Actuator",
@@ -53,50 +67,36 @@
       "Foot Actuator",
       "Heat Sink"
     ],
+    "leftTorso": [
+      "Jump Jet",
+      "Jump Jet"
+    ],
+    "rightArm": [
+      "Shoulder",
+      "Upper Arm Actuator",
+      "Lower Arm Actuator",
+      "Hand Actuator",
+      "ISLargeLaser",
+      "ISLargeLaser",
+      "ISMediumLaser"
+    ],
     "rightLeg": [
       "Hip",
       "Upper Leg Actuator",
       "Lower Leg Actuator",
       "Foot Actuator",
       "Heat Sink"
+    ],
+    "rightTorso": [
+      "Jump Jet",
+      "Jump Jet"
     ]
-  },
-  "info": {
-    "model": "MN-1B",
-    "name": "Munin LAM",
-    "version": "1.0"
-  },
-  "config": {
-    "configuration": "LAM",
-    "techBase": "Inner Sphere",
-    "era": "3025",
-    "rulesLevel": 5
-  },
-  "chassis": {
-    "mass": 45,
-    "engine": "225 Fusion Engine",
-    "structure": "Standard",
-    "myomer": "Standard"
   },
   "temperature": {
     "heatSinksCount": 12,
     "heatSinksType": "Single",
-    "walkMp": 5,
-    "jumpMp": 5
-  },
-  "armor": {
-    "type": "Standard Armor",
-    "laArmor": 12,
-    "raArmor": 12,
-    "ltArmor": 14,
-    "rtArmor": 14,
-    "ctArmor": 20,
-    "hdArmor": 9,
-    "llArmor": 17,
-    "rlArmor": 17,
-    "rtlArmor": 4,
-    "rtrArmor": 4,
-    "rtcArmor": 5
+    "jumpMp": 5,
+    "walkMp": 5
   },
   "weapons": [
     {

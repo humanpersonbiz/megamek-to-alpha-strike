@@ -1,41 +1,36 @@
 {
+  "armor": {
+    "ctArmor": 13,
+    "hdArmor": 9,
+    "laArmor": 8,
+    "llArmor": 11,
+    "ltArmor": 10,
+    "raArmor": 8,
+    "rlArmor": 11,
+    "rtArmor": 10,
+    "rtcArmor": 3,
+    "rtlArmor": 3,
+    "rtrArmor": 3,
+    "type": "Ferro-Fibrous"
+  },
+  "chassis": {
+    "engine": "not-available",
+    "mass": 30,
+    "myomer": "not-available",
+    "structure": "not-available"
+  },
+  "config": {
+    "configuration": "LAM",
+    "era": "3024",
+    "rulesLevel": 5,
+    "techBase": "Inner Sphere"
+  },
+  "info": {
+    "model": "WSP-105-M",
+    "name": "Wasp LAM",
+    "version": "1.0"
+  },
   "slots": {
-    "leftArm": [
-      "Shoulder",
-      "Upper Arm Actuator",
-      "Lower Arm Actuator",
-      "Hand Actuator",
-      "Ferro-Fibrous",
-      "Ferro-Fibrous",
-      "Ferro-Fibrous",
-      "Ferro-Fibrous"
-    ],
-    "rightArm": [
-      "Shoulder",
-      "Upper Arm Actuator",
-      "Lower Arm Actuator",
-      "Hand Actuator",
-      "Ferro-Fibrous",
-      "Ferro-Fibrous",
-      "Ferro-Fibrous",
-      "Ferro-Fibrous"
-    ],
-    "leftTorso": [
-      "Jump Jet",
-      "Jump Jet",
-      "Heat Sink",
-      "Ferro-Fibrous",
-      "Ferro-Fibrous",
-      "Ferro-Fibrous"
-    ],
-    "rightTorso": [
-      "Jump Jet",
-      "Jump Jet",
-      "Heat Sink",
-      "Ferro-Fibrous",
-      "Ferro-Fibrous",
-      "Ferro-Fibrous"
-    ],
     "centerTorso": [
       "Fusion Engine",
       "Fusion Engine",
@@ -58,6 +53,16 @@
       "Sensors",
       "Life Support"
     ],
+    "leftArm": [
+      "Shoulder",
+      "Upper Arm Actuator",
+      "Lower Arm Actuator",
+      "Hand Actuator",
+      "Ferro-Fibrous",
+      "Ferro-Fibrous",
+      "Ferro-Fibrous",
+      "Ferro-Fibrous"
+    ],
     "leftLeg": [
       "Hip",
       "Upper Leg Actuator",
@@ -66,6 +71,24 @@
       "Jump Jet",
       "Heat Sink"
     ],
+    "leftTorso": [
+      "Jump Jet",
+      "Jump Jet",
+      "Heat Sink",
+      "Ferro-Fibrous",
+      "Ferro-Fibrous",
+      "Ferro-Fibrous"
+    ],
+    "rightArm": [
+      "Shoulder",
+      "Upper Arm Actuator",
+      "Lower Arm Actuator",
+      "Hand Actuator",
+      "Ferro-Fibrous",
+      "Ferro-Fibrous",
+      "Ferro-Fibrous",
+      "Ferro-Fibrous"
+    ],
     "rightLeg": [
       "Hip",
       "Upper Leg Actuator",
@@ -73,44 +96,21 @@
       "Foot Actuator",
       "Jump Jet",
       "Heat Sink"
+    ],
+    "rightTorso": [
+      "Jump Jet",
+      "Jump Jet",
+      "Heat Sink",
+      "Ferro-Fibrous",
+      "Ferro-Fibrous",
+      "Ferro-Fibrous"
     ]
-  },
-  "info": {
-    "model": "WSP-105-M",
-    "name": "Wasp LAM",
-    "version": "1.0"
-  },
-  "config": {
-    "configuration": "LAM",
-    "techBase": "Inner Sphere",
-    "era": "3024",
-    "rulesLevel": 5
-  },
-  "chassis": {
-    "mass": 30,
-    "engine": "180 Fusion Engine",
-    "structure": "Standard",
-    "myomer": "Standard"
   },
   "temperature": {
     "heatSinksCount": 11,
     "heatSinksType": "Single",
-    "walkMp": 6,
-    "jumpMp": 6
-  },
-  "armor": {
-    "type": "Ferro-Fibrous",
-    "laArmor": 8,
-    "raArmor": 8,
-    "ltArmor": 10,
-    "rtArmor": 10,
-    "ctArmor": 13,
-    "hdArmor": 9,
-    "llArmor": 11,
-    "rlArmor": 11,
-    "rtlArmor": 3,
-    "rtrArmor": 3,
-    "rtcArmor": 3
+    "jumpMp": 6,
+    "walkMp": 6
   },
   "weapons": [
     {

@@ -1,4 +1,4 @@
-export enum AttributeKeys {
+export const enum AttributeKeys {
   INFO = 'info',
   CONFIG = 'config',
   CHASSIS = 'chassis',
@@ -35,13 +35,13 @@ export type SlotIndicator =
   | 'Right Leg';
 
 export interface IMech {
-  info?: IInfoAttributes;
-  config?: IConfigAttributes;
-  chassis?: IChassisAttributes;
-  temperature?: ITemperatureAttributes;
-  armor?: IArmorAttributes;
-  weapons?: WeaponsAttribute;
-  slots?: ISlotsAttributes;
+  info: IInfoAttributes;
+  config: IConfigAttributes;
+  chassis: IChassisAttributes;
+  temperature: ITemperatureAttributes;
+  armor: IArmorAttributes;
+  weapons: WeaponsAttribute;
+  slots: ISlotsAttributes;
 }
 
 export interface IInfoAttributes {
