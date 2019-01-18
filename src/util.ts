@@ -7,7 +7,7 @@ export const convertToNumber = (value: string) => {
   const num = parseInt(value, 10);
 
   if (/\D/g.test(value) || isNaN(num)) {
-    return value;
+    return null;
   }
 
   return num;

@@ -2,8 +2,14 @@ import { camelCase } from 'lodash';
 import {
   AttributeFunction,
   AttributeKeys,
-  IAttributeObject,
+  Constants,
+  IArmorAttributes,
+  IChassisAttributes,
+  IConfigAttributes,
+  IInfoAttributes,
   IMech,
+  ISlotsAttributes,
+  ITemperatureAttributes,
   IWeapon,
   SlotKey,
   WeaponsAttribute,
@@ -19,7 +25,7 @@ const buildInfoAttribute: AttributeFunction<AttributeKeys.INFO> = (
   lines: string[],
 ) => {
   const [_, version] = getKeyValue(lines[0]);
-  const info: IAttributeObject = {
+  const info: IInfoAttributes = {
     model: lines[2],
     name: lines[1],
     version,
@@ -28,76 +34,152 @@ const buildInfoAttribute: AttributeFunction<AttributeKeys.INFO> = (
   return { key: AttributeKeys.INFO, obj: info };
 };
 
+const isConfigAttribute = (value: string): value is keyof IConfigAttributes =>
+  value === 'configuration' ||
+  value === 'era' ||
+  value === 'rulesLevel' ||
+  value === 'techBase';
+
 const buildConfigAttribute: AttributeFunction<AttributeKeys.CONFIG> = (
   lines: string[],
 ) => {
-  const config: IAttributeObject = {};
+  const config: IConfigAttributes = {
+    configuration: Constants.NOT_AVAILABLE,
+    era: Constants.NOT_AVAILABLE,
+    rulesLevel: 0,
+    techBase: Constants.NOT_AVAILABLE,
+  };
 
   lines.forEach((line, index) => {
     const [key, value] = getKeyValue(line);
+
     if (index === 0) {
       config.configuration = value;
     } else {
       const camelized = camelCase(key);
 
-      config[camelized] =
-        key === 'Rules Level' ? convertToNumber(value) : value;
+      if (isConfigAttribute(camelized)) {
+        config[camelized] =
+          key === 'Rules Level' ? convertToNumber(value) || 0 : value;
+      }
     }
   });
 
   return { key: AttributeKeys.CONFIG, obj: config };
 };
 
+const isChassisAttribute = (value: string): value is keyof IChassisAttributes =>
+  value === 'engine' ||
+  value === 'mass' ||
+  value === 'myomer' ||
+  value === 'structure';
+
 const buildChassisAttribute: AttributeFunction<AttributeKeys.CHASSIS> = (
   lines: string[],
 ) => {
-  const chassis: IAttributeObject = {};
+  const chassis: IChassisAttributes = {
+    engine: Constants.NOT_AVAILABLE,
+    mass: 0,
+    myomer: Constants.NOT_AVAILABLE,
+    structure: Constants.NOT_AVAILABLE,
+  };
 
   lines.forEach(line => {
     const [key, value] = getKeyValue(line);
     const camelized = camelCase(key);
+    const num = convertToNumber(value);
 
-    chassis[camelized] = convertToNumber(value);
+    if (isChassisAttribute(camelized) && num) {
+      chassis[camelized] = num;
+    }
   });
 
   return { key: AttributeKeys.CHASSIS, obj: chassis };
 };
 
+const isTemperatureAttribute = (
+  value: string,
+): value is keyof ITemperatureAttributes =>
+  value === 'heatSinksCount' ||
+  value === 'heatSinksType' ||
+  value === 'jumpMp' ||
+  value === 'walkMp';
+
 const buildTemperatureAttribute: AttributeFunction<
   AttributeKeys.TEMPERATURE
 > = (lines: string[]) => {
-  const temperature: IAttributeObject = {};
+  const temperature: ITemperatureAttributes = {
+    heatSinksCount: 0,
+    heatSinksType: Constants.NOT_AVAILABLE,
+    jumpMp: 0,
+    walkMp: 0,
+  };
 
   lines.forEach((line, index) => {
     const [key, value] = getKeyValue(line);
     const camelized = camelCase(key);
 
     if (index === 0) {
-      const [count, type] = value.split(' ');
+      const [countRaw, type] = value.split(' ');
+      const count = convertToNumber(countRaw);
 
-      temperature.heatSinksCount = convertToNumber(count);
+      if (count) {
+        temperature.heatSinksCount = count;
+      }
       temperature.heatSinksType = type;
-    } else {
-      temperature[camelized] = convertToNumber(value);
+    } else if (isTemperatureAttribute(camelized)) {
+      const num = convertToNumber(value);
+
+      if (num) {
+        temperature[camelized] = num;
+      }
     }
   });
 
   return { key: AttributeKeys.TEMPERATURE, obj: temperature };
 };
 
+const isArmorAttribute = (value: string): value is keyof IArmorAttributes =>
+  value === 'ctArmor' ||
+  value === 'hdArmor' ||
+  value === 'laArmor' ||
+  value === 'llArmor' ||
+  value === 'ltArmor' ||
+  value === 'raArmor' ||
+  value === 'rlArmor' ||
+  value === 'rtArmor' ||
+  value === 'rtcArmor' ||
+  value === 'rtlArmor' ||
+  value === 'rtrArmor' ||
+  value === 'type';
+
 const buildArmorAttribute: AttributeFunction<AttributeKeys.ARMOR> = (
   lines: string[],
 ) => {
-  const armor: IAttributeObject = {};
+  const armor: IArmorAttributes = {
+    ctArmor: 0,
+    hdArmor: 0,
+    laArmor: 0,
+    llArmor: 0,
+    ltArmor: 0,
+    raArmor: 0,
+    rlArmor: 0,
+    rtArmor: 0,
+    rtcArmor: 0,
+    rtlArmor: 0,
+    rtrArmor: 0,
+    type: Constants.NOT_AVAILABLE,
+  };
 
   lines.forEach((line, index) => {
     const [key, value] = getKeyValue(line);
-    const camelized = camelCase(key);
+    const camelized = camelCase(key) as keyof IArmorAttributes;
+    const num = convertToNumber(value);
 
     if (index === 0) {
       armor.type = value;
-    } else {
-      armor[camelized] = convertToNumber(value);
+    } else if (isArmorAttribute(camelized) && num) {
+      armor[camelized] = num;
     }
   });
 
@@ -140,9 +222,19 @@ const buildWeaponsAttribute: AttributeFunction<AttributeKeys.WEAPONS> = (
   return { key: AttributeKeys.WEAPONS, obj: weapons };
 };
 
+const isSlotsAttribute = (value: string): value is keyof ISlotsAttributes =>
+  value === 'centerTorso' ||
+  value === 'head' ||
+  value === 'leftArm' ||
+  value === 'leftLeg' ||
+  value === 'leftTorso' ||
+  value === 'rightArm' ||
+  value === 'rightLeg' ||
+  value === 'rightTorso';
+
 const addSlotToSlotsObject = (
   lines: string[],
-  slotsObject: IAttributeObject,
+  slotsObject: ISlotsAttributes,
 ) => {
   const slots: string[] = [];
 
@@ -151,17 +243,16 @@ const addSlotToSlotsObject = (
       const [key] = getKeyValue(line);
       const camelized = camelCase(key);
 
-      slotsObject[camelized] = slots;
+      if (isSlotsAttribute(camelized)) {
+        slotsObject[camelized] = slots;
+      }
     } else if (line !== '-Empty-') {
       slots.push(line);
     }
   });
 };
 
-const buildIAttributeObject = (
-  lines: string[],
-  slotsObject: IAttributeObject,
-) => {
+const buildIAttributes = (lines: string[], slotsObject: ISlotsAttributes) => {
   const firstLine = lines[0];
 
   if (lineContains(firstLine, 'Version')) {
@@ -218,20 +309,37 @@ export default (data: string) => {
   const lines = data.split(`\r\n`);
   const attributeArrays = groupLinesByAttribute(lines);
 
-  const slots: IAttributeObject = {};
+  const slots: ISlotsAttributes = {
+    centerTorso: [],
+    head: [],
+    leftArm: [],
+    leftLeg: [],
+    leftTorso: [],
+    rightArm: [],
+    rightLeg: [],
+    rightTorso: [],
+  };
   const attributes = attributeArrays.map(attributeArray =>
-    buildIAttributeObject(attributeArray, slots),
+    buildIAttributes(attributeArray, slots),
   );
 
   return attributes.reduce(
-    (accumulator, current) => {
-      if (accumulator && current) {
-        const { key, obj } = current;
+    (mech, currentAttribute) => {
+      if (mech && currentAttribute) {
+        const { key, obj } = currentAttribute;
 
-        accumulator[key] = obj;
+        switch (key) {
+          case AttributeKeys.INFO:
+            mech[key] = obj;
+
+            break;
+
+          default:
+            break;
+        }
       }
 
-      return accumulator;
+      return mech;
     },
     { slots } as IMech,
   );
