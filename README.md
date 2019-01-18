@@ -26,7 +26,7 @@ After that's all done, you just need to install your package dependencies by run
 # using npm
 $ npm install
 
-# yarn
+# using yarn
 $ yarn
 ```
 
@@ -34,4 +34,10 @@ $ yarn
 
 This project uses Typescript, which lets nerds statically type their Javascript ( for safety ! ). Good news, your editor can warn you before you start assigning values all willy-nilly. Bad news, it adds some complexity.
 
-To run the app and start processing some mechs, just run `$ yarn dev` in the project directory. It'll read all the `.mtf` files in `./inFiles`, turn them into `.json` and drop them into `./outFiles`. Cool!
+To run the app and start processing some mechs, just run `$ yarn dev` in the project directory. It'll read all the `.mtf` files in `./inFiles`, turn them into `.json` and drop them into `./outFiles`.
+
+Now, most importantly...
+
+# Have fun!
+
+![The Burgess](https://media.giphy.com/media/4LRkCWLi2MKOc/giphy.gif)
