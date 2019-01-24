@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync, writeFileSync } from 'fs';
-import buildMechJson from './buildMechJson';
+import convertMtsToMegamek from './convertMtsToMegamek';
 import { IMech } from './types';
 import { makeJsonFilename } from './util';
 
@@ -25,7 +25,7 @@ export default async () => {
         getData(filename),
         makeJsonFilename(filename),
       ]);
-      const mech = buildMechJson(data);
+      const mech = convertMtsToMegamek(data);
 
       return writeMechFile(mech, jsonFilename);
     } catch (error) {
